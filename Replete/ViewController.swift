@@ -185,9 +185,9 @@ extension ViewController {
         
         let myTextLayer = CATextLayer()
         myTextLayer.string = s
-        myTextLayer.frame = outputTextView.layer!.frame
+        myTextLayer.frame = outputTextView.layer!.bounds
         outputTextView.layer?.addSublayer(myTextLayer)
-        myTextLayer.position = CGPoint(x: 245 + rect!.origin.x, y: 150 + rect!.origin.y);
+        myTextLayer.position = CGPoint(x: 245 + rect!.origin.x - 500, y: 150 + rect!.origin.y);
         
         CATransaction.begin()
         
@@ -198,9 +198,12 @@ extension ViewController {
         let anim = CABasicAnimation(keyPath: "position");
         
         anim.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
-        anim.fromValue = CGPoint(x: myTextLayer.position.x - 100, y: myTextLayer.position.y);
-        anim.toValue = myTextLayer.position;
-        anim.duration = 2
+        anim.fromValue = myTextLayer.position
+        anim.toValue = CGPoint(x: 245 + rect!.origin.x, y: 150 + rect!.origin.y);
+        anim.duration = 0.1
+        if (!isInput) {
+           anim.beginTime = CACurrentMediaTime() + 0.1
+        }
         
         myTextLayer.add(anim, forKey: "position")
         
