@@ -168,6 +168,19 @@ extension ViewController {
             !text.isEmpty, let s = prepareMessageForDisplay(isInput, isMasthead: isMasthead, text: text)
             else { return }
 
+        let myTextLayer = CATextLayer()
+        //myTextLayer.backgroundColor = CGColor.white
+        myTextLayer.string = s
+        myTextLayer.frame = outputTextView.layer!.bounds
+        outputTextView.layer?.addSublayer(myTextLayer)
+        
+        let anim = CABasicAnimation(keyPath: "position");
+        anim.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
+        anim.fromValue = CGPoint(x: -50, y: 100);
+        anim.toValue = myTextLayer.position;
+        anim.duration = 1
+        myTextLayer.add(anim, forKey: "position")
+        
         if let rng = outputTextView.append(s) {
             if isInput {
                 history.append(rng)
