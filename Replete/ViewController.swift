@@ -187,14 +187,12 @@ extension ViewController {
         myTextLayer.string = s
         myTextLayer.frame = outputTextView.layer!.frame
         outputTextView.layer?.addSublayer(myTextLayer)
-        myTextLayer.position = CGPoint(x: 240 + rect!.origin.x, y: 150 + rect!.origin.y);
+        myTextLayer.position = CGPoint(x: 245 + rect!.origin.x, y: 150 + rect!.origin.y);
         
         CATransaction.begin()
         
         CATransaction.setCompletionBlock{
             myTextLayer.removeFromSuperlayer()
-            
-
         }
         
         let anim = CABasicAnimation(keyPath: "position");
