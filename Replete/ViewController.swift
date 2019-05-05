@@ -168,7 +168,18 @@ extension ViewController {
             !text.isEmpty, let s = prepareMessageForDisplay(isInput, isMasthead: isMasthead, text: text)
             else { return }
 
-        let rng = outputTextView.append("")!
+        let rng = outputTextView.append(s)!
+        if incoming { outputTextView.append("\n") }
+        
+        if isInput {
+            self.history.append(rng)
+            self.historyIndex = self.history.count - 1
+        }
+        outputTextView.setSelectedRange(NSRange(location: 0, length: 0))
+        
+        if let count = outputTextView.textStorage?.length, count > 2 {
+            outputTextView.scrollRangeToVisible(NSRange(location: count - 1, length: 1))
+        }
         
         let rect = outputTextView.layoutManager?.boundingRect(forGlyphRange: rng, in: outputTextView.textContainer!)
         
@@ -183,18 +194,7 @@ extension ViewController {
         CATransaction.setCompletionBlock{
             myTextLayer.removeFromSuperlayer()
             
-            if let rng = outputTextView.append(s) {
-                if isInput {
-                    self.history.append(rng)
-                    self.historyIndex = self.history.count - 1
-                }
-                outputTextView.setSelectedRange(NSRange(location: 0, length: 0))
-            }
-            if incoming { outputTextView.append("\n") }
-            
-            if let count = outputTextView.textStorage?.length, count > 2 {
-                outputTextView.scrollRangeToVisible(NSRange(location: count - 1, length: 1))
-            }
+
         }
         
         let anim = CABasicAnimation(keyPath: "position");
@@ -202,7 +202,7 @@ extension ViewController {
         anim.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
         anim.fromValue = CGPoint(x: myTextLayer.position.x - 100, y: myTextLayer.position.y);
         anim.toValue = myTextLayer.position;
-        anim.duration = 0.3
+        anim.duration = 2
         
         myTextLayer.add(anim, forKey: "position")
         
