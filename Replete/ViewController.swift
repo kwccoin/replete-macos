@@ -168,31 +168,46 @@ extension ViewController {
             !text.isEmpty, let s = prepareMessageForDisplay(isInput, isMasthead: isMasthead, text: text)
             else { return }
 
+        let rng = outputTextView.append("")!
+        
+        let rect = outputTextView.layoutManager?.boundingRect(forGlyphRange: rng, in: outputTextView.textContainer!)
+        
         let myTextLayer = CATextLayer()
-        //myTextLayer.backgroundColor = CGColor.white
         myTextLayer.string = s
         myTextLayer.frame = outputTextView.layer!.bounds
         outputTextView.layer?.addSublayer(myTextLayer)
+        myTextLayer.position = rect!.origin
+        
+        CATransaction.begin()
+        
+        CATransaction.setCompletionBlock{
+            myTextLayer.removeFromSuperlayer()
+            
+            if let rng = outputTextView.append(s) {
+                if isInput {
+                    self.history.append(rng)
+                    self.historyIndex = self.history.count - 1
+                }
+                outputTextView.setSelectedRange(NSRange(location: 0, length: 0))
+            }
+            if incoming { outputTextView.append("\n") }
+            
+            if let count = outputTextView.textStorage?.length, count > 2 {
+                outputTextView.scrollRangeToVisible(NSRange(location: count - 1, length: 1))
+            }
+        }
         
         let anim = CABasicAnimation(keyPath: "position");
+        
         anim.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
-        anim.fromValue = CGPoint(x: -50, y: 100);
+        anim.fromValue = CGPoint(x: myTextLayer.position.x + 100, y: myTextLayer.position.y + 100);
         anim.toValue = myTextLayer.position;
         anim.duration = 1
+        
         myTextLayer.add(anim, forKey: "position")
         
-        if let rng = outputTextView.append(s) {
-            if isInput {
-                history.append(rng)
-                historyIndex = history.count - 1
-            }
-            outputTextView.setSelectedRange(NSRange(location: 0, length: 0))
-        }
-        if incoming { outputTextView.append("\n") }
-
-        if let count = outputTextView.textStorage?.length, count > 2 {
-            outputTextView.scrollRangeToVisible(NSRange(location: count - 1, length: 1))
-        }
+        CATransaction.commit()
+        
     }
 
     func prepareMessageForDisplay(_  isInput: Bool, isMasthead: Bool, text: String) -> NSMutableAttributedString? {
